@@ -1,64 +1,82 @@
 # Aswad Crypto Signals
 
-A manual-execution crypto market scanner built alongside the Everything Claude Trading Claude Code toolkit.
+A multi-exchange crypto market scanner and research tool. It uses public market data and produces alerts for manual review; it never places orders.
 
-## What it does
+## Initial universe
 
-- Scans configured spot markets across multiple exchanges through public market-data endpoints.
-- Starts with BTC, ETH, SOL, HYPE and LINK against USDT on Binance, Bybit, OKX and MEXC (only where a symbol is listed).
-- Analyses 4h and 1d candles.
-- Looks for a range breakout followed by a successful retest, with relative-volume and candle-close-location filters.
-- Calculates an invalidation level and a 2R reference target.
-- Sends Telegram alerts and stores signals in SQLite to prevent repeated alerts.
+- Exchanges: Binance, Bybit, OKX and MEXC (a pair is skipped if not listed).
+- Markets: BTC/USDT, ETH/USDT, SOL/USDT, HYPE/USDT and LINK/USDT.
+- Timeframes: 4h and 1d.
+- Setup: range breakout followed by a confirmed retest, relative-volume filter and candle-close-location filter.
+- Alerts: terminal output or optional Telegram.
+- Storage: SQLite signal history, duplicate suppression and stop/target outcome tracking.
 
-**Alerts only.** This project does not place orders, connect trading accounts, request exchange API keys, or manage positions.
+## Safety and strategy status
 
-## Strategy status
+This is an experimental rule-based strategy, not a proven profitable system or financial advice. Do not rely on live alerts until historical tests, out-of-sample validation and paper monitoring show acceptable results. There is no order execution, trading-account authentication, wallet access or exchange secret requirement.
 
-The rule set is an experimental hypothesis, not a demonstrated profitable strategy. Thresholds are configurable and must be tested with historical data, realistic fees/slippage, out-of-sample periods and paper observation before being considered useful. Signals are not financial advice.
+The scanner ignores the currently forming candle. Signal entry references are calculated at confirmation close. The backtester assumes entry at the next candle open. For OHLCV candles where stop and target are both touched, it assumes the stop happened first.
 
-## Setup
+## Install
 
-Requires Python 3.11+.
+Python 3.11+ is recommended.
 
 ```bash
-cd crypto-signals
 python -m venv .venv
-# Windows PowerShell:
+# Windows PowerShell
 .venv\Scripts\Activate.ps1
-# macOS/Linux:
+# macOS/Linux
 # source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Copy `.env.example` to `.env`, then add your Telegram bot token and chat ID if you want notifications. Never commit `.env`.
+Copy `.env.example` to `.env`. Telegram credentials are optional. Never commit `.env`.
 
-Run a scan:
+## Run a scan
+
+From this directory:
 
 ```bash
 python -m src.main
 ```
 
-The scanner can run without Telegram credentials; it will print signals to the terminal.
+Run continuously (full scan every 5 minutes):
 
-## Initial configuration
+```bash
+python -m src.main --loop --interval 300
+```
 
-Edit `config/settings.yaml` to change exchanges, symbols, timeframes, lookback, volume threshold, breakout/retest tolerance and minimum reward-to-risk ratio.
+View tracked signal outcomes:
 
-## Signal lifecycle
+```bash
+python -m src.main --performance
+```
 
-1. Fetch OHLCV candles from each exchange's public market-data API.
-2. Ignore the currently-forming candle.
-3. Find a prior range breakout.
-4. Check whether the latest closed candle retested and held the breakout level.
-5. Apply relative-volume and candle-close-location filters.
-6. Calculate stop/invalidation and target reference.
-7. Persist and notify once per exchange/symbol/timeframe/candle.
+The outcome tracker marks a signal WIN when its target is touched or LOSS when its stop is touched. If both are touched in one candle, it records LOSS conservatively. Outcomes are gross R multiples and do not include fees/slippage.
 
-## Important limitations
+## Backtesting
 
-- Exchange symbol availability and market conventions differ; unsupported pairs are skipped.
-- Public endpoints can rate-limit or temporarily fail.
-- A 4h or 1d candle is only confirmed after it closes.
-- A 2R target is a planning reference, not a forecast.
-- No position sizing or execution is performed by this application.
+Prepare a CSV with these columns: `timestamp,open,high,low,close,volume`. Use chronological OHLCV data for one exchange, symbol and timeframe. Do not mix symbols or timeframes.
+
+```bash
+python -m src.backtest path/to/ohlcv.csv --fee-bps 8 --slippage-bps 5
+```
+
+The backtester evaluates each candle using only data available through that candle close, enters at the next candle open, and exits at stop/target. It reports trade count, win rate, net R, average R, profit factor and max drawdown. If both stop and target are hit within a candle, stop is assumed first. Fees and slippage are approximate configurable basis-point assumptions, not exchange-specific fee accounting.
+
+For a credible evaluation, use several market regimes, retain a separate untouched out-of-sample period, and compare against simple buy-and-hold / benchmark results. Review the full trade log, not only aggregate metrics.
+
+## Claude Code
+
+- `CLAUDE.md`: project safety rules and development standards.
+- `commands/scan-signals.md`: instructions for reviewing/running a scan.
+- `commands/review-strategy.md`: quantitative strategy review checklist.
+
+## Known limitations
+
+- Exchange OHLCV histories and symbol availability vary.
+- Public endpoints may rate-limit or fail; failed markets are logged and skipped.
+- Backtests use candle OHLCV and cannot reconstruct intrabar order or realistic liquidity.
+- The backtester currently consumes a local CSV; it does not automatically download historical data.
+- Live signal outcome tracking starts when this version is running and cannot reconstruct missed historical alerts.
+- No portfolio-level exposure, position sizing or automated execution is implemented.
