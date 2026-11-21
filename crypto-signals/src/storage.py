@@ -128,4 +128,5 @@ def performance_summary(database_path: str) -> dict[str, Any]:
         "breakevens": int(row["breakevens"] or 0),
         "win_rate_pct": round((wins / closed) * 100, 2) if closed else 0.0,
         "total_realized_r": round(float(row["total_realized_r"] or 0.0), 4),
+        "total_r": round(float(row["total_realized_r"] or 0.0), 4),
     }
