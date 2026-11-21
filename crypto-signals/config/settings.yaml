@@ -16,7 +16,7 @@ timeframes:
   - 1d
 
 strategy:
-  candle_limit: 120
+  candle_limit: 350
   range_lookback: 20
   atr_period: 14
   relative_volume_min: 1.5
