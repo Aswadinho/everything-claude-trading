@@ -1,0 +1,1 @@
+"""Aswad Crypto Signals package."""
