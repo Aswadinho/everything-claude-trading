@@ -27,4 +27,5 @@ jobs:
           cache: pip
           cache-dependency-path: crypto-signals/requirements.txt
       - run: pip install -r requirements.txt
+      - run: git rev-parse HEAD
       - run: PYTHONPATH=. pytest -q
