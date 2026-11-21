@@ -5,16 +5,16 @@ import requests
 
 def format_message(exchange_id: str, symbol: str, timeframe: str, signal: dict) -> str:
     return (
-        f"ASWAD CRYPTO SIGNAL\\n"
-        f"{exchange_id.upper()} | {symbol} | {timeframe}\\n"
-        f"Setup: {signal['direction']} breakout + retest\\n"
-        f"Entry reference: {signal['entry']:.8g}\\n"
-        f"Invalidation / stop: {signal['stop']:.8g}\\n"
-        f"Target reference: {signal['target']:.8g}\\n"
-        f"R:R: {signal['risk_reward']:.2f}R\\n"
-        f"Relative volume: {signal['relative_volume']:.2f}x\\n"
-        f"Breakout level: {signal['breakout_level']:.8g}\\n"
-        f"Closed candle: {signal['signal_time']}\\n"
+        f"ASWAD CRYPTO SIGNAL\n"
+        f"{exchange_id.upper()} | {symbol} | {timeframe}\n"
+        f"Setup: {signal['direction']} breakout + retest\n"
+        f"Entry reference: {signal['entry']:.8g}\n"
+        f"Invalidation / stop: {signal['stop']:.8g}\n"
+        f"Target reference: {signal['target']:.8g}\n"
+        f"R:R: {signal['risk_reward']:.2f}R\n"
+        f"Relative volume: {signal['relative_volume']:.2f}x\n"
+        f"Breakout level: {signal['breakout_level']:.8g}\n"
+        f"Closed candle: {signal['signal_time']}\n"
         f"Manual execution only. Verify price, fees and liquidity before acting."
     )
 
