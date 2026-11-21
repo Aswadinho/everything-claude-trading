@@ -31,7 +31,7 @@ def sample_frame():
     })
     rows.append({
         "timestamp": pd.Timestamp("2026-01-06 04:00", tz="UTC"),
-        "open": 103.0, "high": 104.0, "low": 102.5,
+        "open": 103.0, "high": 104.0, "low": 101.0,
         "close": 103.8, "volume": 130.0,
     })
     return pd.DataFrame(rows)
