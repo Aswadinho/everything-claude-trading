@@ -31,14 +31,15 @@ jobs:
           done
           echo "All agent files valid."
 
-      - name: Validate skill frontmatter
+      - name: Validate skill documents
         run: |
-          echo "Validating skill files..."
-          find skills -name "*.md" | while read file; do
+          echo "Validating skill entry-point documents..."
+          find skills -name "SKILL.md" -type f | while read file; do
             echo "Checking $file"
-            head -1 "$file" | grep -q "^---" || { echo "ERROR: $file missing frontmatter"; exit 1; }
+            test -s "$file" || { echo "ERROR: $file is empty"; exit 1; }
+            head -1 "$file" | grep -q "^# " || { echo "ERROR: $file must start with a Markdown title"; exit 1; }
           done
-          echo "All skill files valid."
+          echo "All skill documents valid."
 
       - name: Validate command frontmatter
         run: |
