@@ -1,0 +1,30 @@
+exchanges:
+  - binance
+  - bybit
+  - okx
+  - mexc
+
+symbols:
+  - BTC/USDT
+  - ETH/USDT
+  - SOL/USDT
+  - HYPE/USDT
+  - LINK/USDT
+
+timeframes:
+  - 4h
+  - 1d
+
+strategy:
+  candle_limit: 350
+  range_lookback: 20
+  atr_period: 14
+  relative_volume_min: 1.5
+  close_location_long_min: 0.70
+  close_location_short_max: 0.30
+  retest_tolerance_atr: 0.25
+  stop_buffer_atr: 0.20
+  minimum_reward_risk: 2.0
+
+scanner:
+  rate_limit_seconds: 0.25
